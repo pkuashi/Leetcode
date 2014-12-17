@@ -14,7 +14,7 @@ public:
         while (i < work.length()) {
             if (work[i] != delim){
                 buf += work[i];
-            } 
+            }
             else if (buf.length() > 0) {
                 flds.push_back(buf);
                 buf = "";
@@ -25,14 +25,14 @@ public:
             flds.push_back(buf);
         return flds;
     }
-    
+
     size_t find(const string &a, size_t start, const string &b)
     {
         if (a.empty() || b.empty() || a.size() < b.size())
         {
             return string::npos;
         }
-        
+
         size_t i = start, j = 0;
         while (i < a.size() && j < b.size())
         {
@@ -46,7 +46,7 @@ public:
                 j = 0;
             }
         }
-        
+
         if (j == b.size())
         {
             return i;
@@ -56,14 +56,14 @@ public:
             return string::npos;
         }
     }
-    
+
     size_t rfind(const string &a, const string &b)
     {
         if (a.empty() || b.empty() || a.size() < b.size())
         {
             return string::npos;
         }
-        
+
         size_t i = a.size() - b.size(), j = 0;
         while (i >= 0 && j < b.size())
         {
@@ -81,11 +81,11 @@ public:
                 {
                     break;
                 }
-                
+
                 j = 0;
             }
         }
-        
+
         if (j == b.size())
         {
             return i;
@@ -95,7 +95,7 @@ public:
             return string::npos;
         }
     }
-    
+
     bool isMatch(const char *s, const char *p) {
         string stringS(s);
         string stringP(p);
@@ -113,19 +113,20 @@ public:
         {
             return true;
         }
-        
+
+        // just single token in p and no * in p
         if (tokens.size() <= 1 && stringP.find('*') == string::npos)
         {
             return find(stringS, 0, stringP) == 0 && stringS.size() == stringP.size();
         }
-        
+
         bool checkStart = false;
         bool checkEnd = false;
         if (stringP.front() != '*')
         {
             checkStart = true;
         }
-        
+
         if (stringP.back() != '*')
         {
             checkEnd = true;
@@ -133,9 +134,11 @@ public:
 
         size_t i=0;
         size_t j=0;
-        while(i < stringS.size() && j < tokens.size())
+        while (i < stringS.size() && j < tokens.size())
         {
             size_t pos = string::npos;
+
+            // we have to use rfind to check whether the last token of p is the suffix of s if no * at the end
             if (checkEnd && j == tokens.size() - 1)
             {
                 pos = rfind(stringS, tokens[j]);
@@ -144,16 +147,18 @@ public:
             {
                 pos = find(stringS, i, tokens[j]);
             }
-            
+
+            // this check only make sense with rfind. Probably better add one parameter in rfind about the initial index to find
+            if (pos < i)
+            {
+                break;
+            }
+
             if (j == 0 && checkStart && pos != 0)
             {
                 break;
             }
-            else if(j == tokens.size() - 1 && checkEnd && (pos != stringS.size() - tokens.back().size() || pos < i))
-            {
-                break;
-            }
-            else if (j == tokens.size() - 1 && !checkEnd && pos < i)
+            else if(j == tokens.size() - 1 && checkEnd && pos != stringS.size() - tokens.back().size())
             {
                 break;
             }
@@ -161,7 +166,7 @@ public:
             {
                 break;
             }
-            
+
             i = pos + tokens[j].size();
             j++;
         }
