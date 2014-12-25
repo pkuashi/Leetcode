@@ -1,45 +1,79 @@
+#include <algorithm>
+#include <utility>
+#include <vector>
+#include <numeric>
+#include <iostream>
+
+using namespace std;
+
 class Solution {
 public:
-    double findMedianSortedArrays(int A[], int m, int B[], int n) {
-        int medianA = A[m / 2];
-        int medianB = B[n / 2];
+    double findMedianSortedArrays(int A[], int m, int B[], int n)
+    {
+        vector<vector<int>> arrays{vector<int>(A, A+m), vector<int>(B, B+n)};
+        vector<pair<size_t, size_t>> boudaries(arrays.size());
 
-        int temp = SearchIndex(medianB, A, m);
-        int floorAIndex = medianA <  temp ? medianA : temp;
-        int ceilingAIndex = medianA > temp ? medianA : temp;
-        temp = SearchIndex(medianA, B, n);
-        int floorBIndex = medianB < temp ? medianB : temp;
-        int ceilingBIndex = medianB > temp ? medianB : temp;
-
+        size_t halfSize = std::accumulate(arrays.begin(), arrays.end(), 0, [](int x, vector<int> y){return x + y.size(); }) / 2;
         double result = 0;
-        int indexInA = 0, indexInB = 0;
-        do
+        for (int i = 0; i < arrays.size(); i++)
         {
-            bool big = true;
-            if (indexInA + indexInB < (m + n) / 2)
+            boudaries[i].first = 0;
+            boudaries[i].second = arrays[i].size() - 1;
+            result = arrays[i][arrays.size()/2];
+
+            // the -1 stands of the result itself in its own array, we should exclude it.
+            size_t count = -1 + std::accumulate(
+                arrays.begin(),
+                arrays.end(),
+                0 /*init*/,
+                [&](int x, vector<int> y){return x + numberofElementsBefore(result, y);});
+            if (count == halfSize)
             {
-                big = false;
+                return result;
             }
-            result = GetIndex(A, floorAIndex, ceilingAIndex, B, floorBIndex, ceilingBIndex, big);
-            indexInA = SearchIndex(result, A, m);
-            indexInB = SearchIndex(result, B, n);
-        } while (indexInA + indexInB != (m+n)/2); 
+        }
 
         return result;
     }
 
-    double GetIndex(int Array1[], int start1, int end1, int Array2[], int start2, int end2, bool big)
+    int numberofElementsBefore(double value, vector<int> array)
     {
-        return 0;
-    }
+        if (array.size() == 0)
+        {
+            return 0;
+        }
 
-    int SearchIndex(double value, int arrary[], int length)
-    {
-        return 0;
+        int start = 0, end = array.size() - 1;
+
+        do
+        {
+            int result = (start + end) / 2;
+
+            if (array[result] > value)
+            {
+                end = result;
+            }
+            else if (array[result] < value)
+            {
+                start = result;
+            }
+            else if ((double)array[result] == value)
+            {
+
+            }
+        }
+        while (start < end);
+
+        return start;
     }
 };
 
 int main()
 {
+    int A[5]{1, 3, 6, 9, 13};
+    int B[4]{2, 15, 17, 21};
+
+    Solution solution;
+    return solution.findMedianSortedArrays(A, 5, B, 4);
     return 0;
 }
