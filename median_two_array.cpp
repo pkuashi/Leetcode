@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <algorithm>
 #include <utility>
 #include <vector>
@@ -14,7 +15,13 @@ public:
         vector<vector<int>> arrays{vector<int>(A, A+m), vector<int>(B, B+n)};
         vector<pair<size_t, size_t>> boudaries(arrays.size());
 
-        double result = numeric_limits<double>::min();
+        bool even = std::accumulate(
+            arrays.begin(),
+            arrays.end(),
+            0 /*init*/,
+            [&](int x, vector<int> y){ return x + y.size(); }) % 2 == 0;
+
+        vector<double> result;
         for (size_t i = 0; i < arrays.size(); i++)
         {
             boudaries[i].first = 0;
@@ -25,6 +32,7 @@ public:
         {
             bool found = false;
             size_t candidate = 0;
+
             do
             {
                 size_t index = (boudaries[i].first + boudaries[i].second) / 2;
@@ -43,15 +51,8 @@ public:
                     0 /*init*/,
                     [&](int x, vector<int> y){ return x + numberofElementsGreaterOrEqaul(candidate, y); });
 
-                if (smaller_count == bigger_count)
+                if ((!even && smaller_count == bigger_count) || (even && abs(smaller_count - bigger_count) == 1))
                 {
-                    result = candidate;
-                    found = true;
-                    break;
-                }
-                else if (smaller_count > bigger_count)
-                {
-                    boudaries[i].second = index;
                 }
                 else
                 {
@@ -65,7 +66,7 @@ public:
                 break;
             }
 
-            // The right boudary element is not visited
+            // The right boundary element is not visited. TODO: is there a better way to handle the right boundary?
             // the -1 stands of the candidate itself in its own array, we should exclude it.
             size_t smaller_count = -1 + std::accumulate(
                 arrays.begin(),
@@ -79,14 +80,26 @@ public:
                 0 /*init*/,
                 [&](int x, vector<int> y){ return x + numberofElementsGreaterOrEqaul(boudaries[i].second, y); });
 
-            if (smaller_count == bigger_count)
+            if ((!even && smaller_count == bigger_count) || (even && abs(smaller_count - bigger_count) == 1))
             {
-                result = candidate;
+                result.push_back(candidate);
                 break;
             }
         }
 
-        return result;
+        if (even)
+        {
+
+        }
+
+        if (even)
+        {
+            return (result[0] + result[1])/2;
+        }
+        else
+        {
+            return result[0];
+        }
     }
 
     size_t numberofElementsLessOrEqual(double value, vector<int> array)
