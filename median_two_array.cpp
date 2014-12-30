@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <utility>
 #include <vector>
+#include <unordered_set>
 #include <numeric>
 #include <iostream>
 #include <limits>
@@ -21,7 +22,7 @@ public:
             0 /*init*/,
             [&](int x, vector<int> y){ return x + y.size(); }) % 2 == 0;
 
-        vector<double> result;
+        unordered_set<double> result;
         for (size_t i = 0; i < arrays.size(); i++)
         {
             boudaries[i].first = 0;
@@ -30,7 +31,11 @@ public:
 
         for (size_t i = 0; i < arrays.size(); i++)
         {
-            bool found = false;
+            if (arrays[i].size() == 0)
+            {
+                continue;
+            }
+
             size_t candidate = 0;
 
             do
@@ -39,20 +44,38 @@ public:
                 candidate = arrays[i][index];
 
                 // the -1 stands of the candidate itself in its own array, we should exclude it.
-                size_t smaller_count = -1 + std::accumulate(
+                int smaller_count = -1 + std::accumulate(
                     arrays.begin(),
                     arrays.end(),
                     0 /*init*/,
-                    [&](int x, vector<int> y){ return x + numberofElementsLessOrEqual(candidate, y);});
+                    [&](int x, vector<int> y){ return x + numberofElementsLessOrEqual(candidate, y); });
 
-                size_t bigger_count = -1 + std::accumulate(
+                int bigger_count = -1 + std::accumulate(
                     arrays.begin(),
                     arrays.end(),
                     0 /*init*/,
                     [&](int x, vector<int> y){ return x + numberofElementsGreaterOrEqaul(candidate, y); });
 
-                if ((!even && smaller_count == bigger_count) || (even && abs(smaller_count - bigger_count) == 1))
+                cout << "For candidate: " << candidate << "-- smaller_count: " << smaller_count << "; bigger_count: " << bigger_count << endl;
+                if (!even && smaller_count == bigger_count)
                 {
+                    cout << "get one candidate: " << candidate << endl;
+                    result.insert(candidate);
+                    break;
+                }
+                else if (even && abs(smaller_count - bigger_count) == 1)
+                {
+                    cout << "get one median: " << candidate << endl;
+                    result.insert(candidate);
+                    if (result.size() == 2)
+                    {
+                        break;
+                    }
+                }
+
+                if (smaller_count > bigger_count)
+                {
+                    boudaries[i].second = index;
                 }
                 else
                 {
@@ -61,44 +84,42 @@ public:
             }
             while (boudaries[i].second - boudaries[i].first > 1);
 
-            if (found)
-            {
-                break;
-            }
-
             // The right boundary element is not visited. TODO: is there a better way to handle the right boundary?
             // the -1 stands of the candidate itself in its own array, we should exclude it.
-            size_t smaller_count = -1 + std::accumulate(
+            candidate = boudaries[i].second;
+            int smaller_count = -1 + std::accumulate(
                 arrays.begin(),
                 arrays.end(),
                 0 /*init*/,
-                [&](int x, vector<int> y){ return x + numberofElementsLessOrEqual(boudaries[i].second, y);});
+                [&](int x, vector<int> y){ return x + numberofElementsLessOrEqual(candidate, y); });
 
-            size_t bigger_count = -1 + std::accumulate(
+            int bigger_count = -1 + std::accumulate(
                 arrays.begin(),
                 arrays.end(),
                 0 /*init*/,
-                [&](int x, vector<int> y){ return x + numberofElementsGreaterOrEqaul(boudaries[i].second, y); });
+                [&](int x, vector<int> y){ return x + numberofElementsGreaterOrEqaul(candidate, y); });
 
+            cout << "For candidate: " << candidate << "-- smaller_count: " << smaller_count << "; bigger_count: " << bigger_count << endl;
             if ((!even && smaller_count == bigger_count) || (even && abs(smaller_count - bigger_count) == 1))
             {
-                result.push_back(candidate);
+                result.insert(candidate);
+            }
+
+            if ((!even && result.size() == 1) || (even && result.size() == 2))
+            {
                 break;
             }
         }
 
-        if (even)
-        {
-
-        }
+        cout << "result size: "<< result.size() <<endl;
 
         if (even)
         {
-            return (result[0] + result[1])/2;
+            return std::accumulate(result.begin(), result.end(), (double)0 /*init*/, [&](double x, int y){ return x + (double)y / result.size(); });
         }
         else
         {
-            return result[0];
+            return *result.begin();
         }
     }
 
