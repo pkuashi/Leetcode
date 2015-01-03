@@ -12,7 +12,7 @@ TEST(median_two_array, HappyPath_Odd)
     ASSERT_EQ(8, median);
 }
 
-TEST(median_two_array, HappyPath_Odd_2)
+TEST(median_two_array, Meidan_Appear_Multiple_Instances)
 {
     Solution solution;
     int A[]{1,2};
