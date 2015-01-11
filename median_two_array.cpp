@@ -40,6 +40,7 @@ public:
 
     void binary_tranverse(int a[], size_t m, int b[], size_t n, unordered_set<double>& result)
     {
+        bool even = (m + n) % 2 == 0 ? true : false;
         size_t begin = 0, end = m;
 
         do
@@ -75,7 +76,7 @@ public:
                 }
             }
 
-            if (result.size() == 2)
+            if ((even && result.size() == 2) || (!even && result.size() == 1))
             {
                 break;
             }
