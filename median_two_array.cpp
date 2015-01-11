@@ -31,6 +31,7 @@ public:
         }
         else if (result.size() == 2)
         {
+            // TODO: ugly implenmentation
             return std::accumulate(
                 result.begin(),
                 result.end(),
@@ -80,6 +81,10 @@ public:
                 {
                     cout << "find " << a[index] << endl;
                     result.insert(a[index]);
+                }
+                else
+                {
+                    break;
                 }
             }
 
