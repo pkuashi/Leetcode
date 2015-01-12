@@ -18,9 +18,21 @@ public:
         unordered_set<double> result;
 
         binary_tranverse(A, m, B, n, result);
-        if (!even && result.size() == 1)
+        if ((!even && result.size() == 1) || (even && result.size() == 2))
         {
-            return *result.begin();
+            if (!even)
+            {
+                return *result.begin();
+            }
+            else
+            {
+                // TODO: ugly implementation
+                return std::accumulate(
+                    result.begin(),
+                    result.end(),
+                    (double)0 /*init*/,
+                    [&](double x, int y){ return x + (double)y / result.size(); });
+            }
         }
 
         binary_tranverse(B, n, A, m, result);
@@ -46,9 +58,30 @@ public:
 
     void binary_tranverse(int a[], size_t m, int b[], size_t n, unordered_set<double>& result)
     {
+        if (m == 0)
+        {
+            return;
+        }
+
         bool even = (m + n) % 2 == 0 ? true : false;
-        size_t begin = 0, end = m;
         size_t halfSize = (m + n - 1) / 2;
+
+        if (n == 0)
+        {
+            if (!even)
+            {
+                result.insert(a[halfSize]);
+            }
+            else
+            {
+                result.insert(a[halfSize + 1]);
+                result.insert(a[halfSize]);
+            }
+
+            return;
+        }
+
+        size_t begin = 0, end = m;
 
         do
         {
@@ -58,12 +91,17 @@ public:
 
             if (halfSize > index)
             {
-                if (a[index] > b[halfSize - index])
+                int frontPivotIndex = halfSize - index - 1;
+                int endPivotIndex = halfSize - index;
+                int endPlusPivotIndex = halfSize - index + 1;
+
+                if (endPivotIndex < n && ((!even && a[index] > b[endPivotIndex]) ||
+                    (even && ((endPlusPivotIndex < n && a[index] > b[endPlusPivotIndex]) || endPlusPivotIndex >= n))))
                 {
                     cout << a[index] << " is too big." << endl;
                     end = index;
                 }
-                else if (a[index] < b[halfSize - index - 1])
+                else if (endPivotIndex >= n || a[index] < b[frontPivotIndex])
                 {
                     cout << a[index] << " is too small." << endl;
                     begin = index;

@@ -32,6 +32,16 @@ TEST(median_two_array, HappyPath_Even)
     ASSERT_EQ(8.5, median);
 }
 
+TEST(median_two_array, HappyPath_Even_SingleElement)
+{
+    Solution solution;
+    int A[]{1};
+    int B[]{1};
+    double median = solution.findMedianSortedArrays(A, 1, B, 1);
+
+    ASSERT_EQ(8.5, median);
+}
+
 TEST(median_two_array, OnOverlap)
 {
     Solution solution;
@@ -62,15 +72,15 @@ TEST(median_two_array, SmallAAndLargeB)
     ASSERT_EQ(11, median);
 }
 
-//TEST(median_two_array, SingleElement)
-//{
-//    Solution solution;
-//    int A[0]{};
-//    int B[]{7};
-//    double median = solution.findMedianSortedArrays(A, 0, B, 1);
-//
-//    ASSERT_EQ(7, median);
-//}
+TEST(median_two_array, EmptyArray)
+{
+    Solution solution;
+
+    int B[]{2, 3};
+    double median = solution.findMedianSortedArrays(nullptr, 0, B, 2);
+
+    ASSERT_EQ(2.5, median);
+}
 
 int main(int argc, char **argv)
 {
