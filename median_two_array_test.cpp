@@ -42,6 +42,26 @@ TEST(median_two_array, OnOverlap)
     ASSERT_EQ(9, median);
 }
 
+TEST(median_two_array, LargeAAndSmallB)
+{
+    Solution solution;
+    int A[]{1, 3, 5, 7, 9, 11, 13, 15, 17, 19};
+    int B[]{15};
+    double median = solution.findMedianSortedArrays(A, 10, B, 1);
+
+    ASSERT_EQ(11, median);
+}
+
+TEST(median_two_array, SmallAAndLargeB)
+{
+    Solution solution;
+    int A[]{15};
+    int B[]{1, 3, 5, 7, 9, 11, 13, 15, 17, 19};
+    double median = solution.findMedianSortedArrays(A, 1, B, 10);
+
+    ASSERT_EQ(11, median);
+}
+
 //TEST(median_two_array, SingleElement)
 //{
 //    Solution solution;

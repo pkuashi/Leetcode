@@ -31,7 +31,7 @@ public:
         }
         else if (result.size() == 2)
         {
-            // TODO: ugly implenmentation
+            // TODO: ugly implementation
             return std::accumulate(
                 result.begin(),
                 result.end(),
