@@ -54,45 +54,7 @@ public:
                 {
                     result.push_back(f + j);
                 }
-            }   
-        }
-
-        /*if (numbers.size() == 1)
-        {
-            for (auto i : stage)
-            {
-                for (auto j : Solution::LetterNumberMapping.at(numbers[0]))
-                {
-                    result.push_back(i + j);
-                }
-            }
-
-            return;
-        }
-
-        vector<string> newStage;
-        int number = numbers[0];
-        vector<int> newNumbers(++numbers.begin(), numbers.end());
-        for (auto i : stage)
-        {
-            for (auto j : this->LetterNumberMapping[number])
-            {
-                newStage.push_back(i + j);
             }
         }
-
-        PrintNumber(result, newNumbers);*/
     }
 };
-
-void main()
-{
-    Solution solution;
-
-    auto result = solution.letterCombinations(string("23"));
-
-    for (auto k : result)
-    {
-        cout << k << endl;
-    }
-}
