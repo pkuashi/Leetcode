@@ -2,10 +2,10 @@
 #include <algorithm>
 #include <utility>
 #include <vector>
-#include <unordered_set>
 #include <numeric>
 #include <iostream>
 #include <limits>
+#include <deque>
 
 using namespace std;
 
@@ -13,50 +13,49 @@ class Solution {
 public:
     double findMedianSortedArrays(int A[], int m, int B[], int n)
     {
+#ifdef _DEBUG
+        cout << "Array A, size " << m << endl;
+        for (int i = 0; i < m; i++)
+        {
+            cout << A[i] << " ";
+        }
+        cout << endl;
+
+        cout << "Array B, size " << n << endl;
+        for (int i = 0; i < n; i++)
+        {
+            cout << B[i] << " ";
+        }
+        cout << endl;
+#endif
         bool even = (m + n) % 2 == 0 ? true : false;
 
-        unordered_set<double> result;
+        deque<double> result;
 
         binary_tranverse(A, m, B, n, result);
-        if ((!even && result.size() == 1) || (even && result.size() == 2))
-        {
-            if (!even)
-            {
-                return *result.begin();
-            }
-            else
-            {
-                // TODO: ugly implementation
-                return std::accumulate(
-                    result.begin(),
-                    result.end(),
-                    (double)0 /*init*/,
-                    [&](double x, int y){ return x + (double)y / result.size(); });
-            }
-        }
-
         binary_tranverse(B, n, A, m, result);
 
-        if (!even)
+        sort(result.begin(), result.end());
+        auto last = unique(result.begin(), result.end());
+        result.resize(distance(result.begin(), last));
+        if (result.size() == 1)
         {
             return *result.begin();
         }
         else if (result.size() == 2)
         {
             // TODO: ugly implementation
-            return std::accumulate(
-                result.begin(),
-                result.end(),
-                (double)0 /*init*/,
-                [&](double x, int y){ return x + (double)y / result.size(); });
+            return (double)(result[0] + result[1]) / 2;
         }
         else
         {
-            throw "Algorithm problem, should find the median anyway.";
+            string message("Algorithm problem, should find the median anyway or at most 2 number. The size of the result: ");
+            message += result.size();
+            throw message;
         }
     }
 
-    void binary_tranverse(int a[], size_t m, int b[], size_t n, unordered_set<double>& result)
+    void binary_tranverse(int a[], size_t m, int b[], size_t n, deque<double>& result)
     {
         if (m == 0)
         {
@@ -70,12 +69,12 @@ public:
         {
             if (!even)
             {
-                result.insert(a[halfSize]);
+                result.push_back(a[halfSize]);
             }
             else
             {
-                result.insert(a[halfSize + 1]);
-                result.insert(a[halfSize]);
+                result.push_back(a[halfSize + 1]);
+                result.push_back(a[halfSize]);
             }
 
             return;
@@ -86,51 +85,91 @@ public:
         do
         {
             size_t index = (begin + end) / 2;
+#ifdef _DEBUG
             cout << "begin=" << begin << "; end=" << end << endl;
             cout << "try " << a[index] << endl;
+#endif
+
+            int frontPivotIndex = halfSize - index - 1;
+            int endPivotIndex = halfSize - index;
+            int endPlusPivotIndex = halfSize - index + 1;
 
             if (halfSize > index)
             {
-                int frontPivotIndex = halfSize - index - 1;
-                int endPivotIndex = halfSize - index;
-                int endPlusPivotIndex = halfSize - index + 1;
-
-                if (endPivotIndex < n && ((!even && a[index] > b[endPivotIndex]) ||
-                    (even && ((endPlusPivotIndex < n && a[index] > b[endPlusPivotIndex]) || endPlusPivotIndex >= n))))
+                if (endPivotIndex < n && 
+                    ((!even && a[index] > b[endPivotIndex]) ||
+                     (even && ((endPlusPivotIndex < n && a[index] > b[endPlusPivotIndex])))))
                 {
+#ifdef _DEBUG
                     cout << a[index] << " is too big." << endl;
+#endif
                     end = index;
                 }
-                else if (endPivotIndex >= n || a[index] < b[frontPivotIndex])
+                else if (/*endPivotIndex >= n || */(frontPivotIndex < n && a[index] < b[frontPivotIndex]) || frontPivotIndex >= n)
                 {
+#ifdef _DEBUG
                     cout << a[index] << " is too small." << endl;
+#endif
                     begin = index;
                 }
                 else
                 {
+#ifdef _DEBUG
                     cout << "find " << a[index] << endl;
-                    result.insert(a[index]);
-                    begin = index;
+#endif
+                    result.push_back(a[index]);
+                    if (even && ((endPivotIndex < n && a[index] >= b[endPivotIndex]) || endPivotIndex < 0))
+                    {
+                        end = index;
+                    }
+                    else
+                    {
+                        begin = index;
+                    }
                 }
             }
             else
             {
-                if (a[index] <= b[0] && index == halfSize)
+                if ((!even && index == halfSize && a[index] <= b[0]) ||
+                    (even && (index == halfSize && ((n > 1 && a[index] <= b[1]) || (n == 1)) || (index == halfSize + 1 && a[index] <= b[0]))))
                 {
+#ifdef _DEBUG
                     cout << "find " << a[index] << endl;
-                    result.insert(a[index]);
+#endif
+                    result.push_back(a[index]);
+
+                    if (even && ((endPivotIndex < n && a[index] >= b[endPivotIndex]) || endPivotIndex < 0))
+                    {
+                        end = index;
+                    }
+                    else
+                    {
+                        begin = index;
+                    }
                 }
                 else
                 {
-                    break;
+                    end = index;
+                    continue;
                 }
             }
-
-            if ((even && result.size() == 2) || (!even && result.size() == 1))
-            {
-                break;
-            }
         } while (end - begin > 1);
+
+        // The begin is not visited yet unless it is a single element array.
+        if (m > 1 && begin == 0)
+        {
+#ifdef _DEBUG
+            cout << "try " << a[0] << endl;
+#endif
+            if ((!even && halfSize <= n && a[0] >= b[halfSize - 1] && ((halfSize < n && b[halfSize] >= a[0]) || halfSize >= n)) || 
+                (even && ((halfSize < n && a[0] >= b[halfSize] && (a[0] <= b[halfSize + 1] || halfSize + 1 >= n)) || (halfSize <=n && a[0] >= b[halfSize - 1] && (halfSize >= n || a[0] <= b[halfSize])))) ||
+                (n == 0 && m == 2))
+            {
+#ifdef _DEBUG
+                cout << "find " << a[0] << endl;
+#endif
+                result.push_back(a[0]);
+            }
+        }
     }
 };
-
