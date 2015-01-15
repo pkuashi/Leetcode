@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <list>
 
 using namespace std;
 
@@ -24,24 +25,39 @@ public:
     
 
     vector<string> letterCombinations(string digits) {
-        vector<string> result;
-        if (digits.size() == 0)
+        list<string> result{""};
+        if (digits.size() >= 0)
         {
-            return result;
-        }
-        vector<int> numbers;
-        for (int i = 0; i < digits.size(); i++)
-        {
-            numbers.push_back((int)(numbers[i] - '0'));
+            vector<int> numbers;
+            for (int i = 0; i < digits.size(); i++)
+            {
+                numbers.push_back((int)(digits[i] - '0'));
+            }
+
+            PrintNumber(result, numbers);
         }
 
-        vector<string> stage{""};
-        PrintNumber(result, stage, numbers);
+        return vector<string>(result.begin(), result.end());
     }
 
-    void PrintNumber(vector<string> &result, const vector<string> &stage, const vector<int> numbers)
+    void PrintNumber(list<string> &result, const vector<int> &numbers)
     {
-        if (numbers.size() == 1)
+        for (auto n : numbers)
+        {
+            size_t count = result.size();
+            for (size_t i = 0; i < count; i++)
+            {
+                string f = result.front();
+                result.pop_front();
+
+                for (auto j : this->LetterNumberMapping[n])
+                {
+                    result.push_back(f + j);
+                }
+            }   
+        }
+
+        /*if (numbers.size() == 1)
         {
             for (auto i : stage)
             {
@@ -54,7 +70,18 @@ public:
             return;
         }
 
+        vector<string> newStage;
+        int number = numbers[0];
+        vector<int> newNumbers(++numbers.begin(), numbers.end());
+        for (auto i : stage)
+        {
+            for (auto j : this->LetterNumberMapping[number])
+            {
+                newStage.push_back(i + j);
+            }
+        }
 
+        PrintNumber(result, newNumbers);*/
     }
 };
 
@@ -62,5 +89,10 @@ void main()
 {
     Solution solution;
 
-    solution.letterCombinations("23");
+    auto result = solution.letterCombinations(string("23"));
+
+    for (auto k : result)
+    {
+        cout << k << endl;
+    }
 }
