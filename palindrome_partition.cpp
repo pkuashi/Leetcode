@@ -2,42 +2,49 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <iterator>
+#include <list>
 
 using namespace std;
 
 class Solution {
 public:
     vector<vector<string>> partition(string s) {
+        if (s.size() == 0) return vector<vector<string>>();
+
+        auto listResult = partition_palindrome(s);
         vector<vector<string>> result;
 
-        if (s.size() == 0) return result;
+        for (auto i : listResult)
+        {
+            vector<string> partition(i.begin(), i.end());
+            result.push_back(partition);
+        }
 
-        return partition_palindrome(result, s);
+        return result;
     }
 
-    vector<vector<string>> partition_palindrome(const vector<vector<string>> &input, string &s)
+    list<list<string>> partition_palindrome(string &s)
     {
-        vector<vector<string>> result;
+        list<list<string>> result;
         if (s.size() == 0) return result;
 
         for (int i = 0; i < s.size(); i++)
         {
-            if (IsPalinDrome(s, 0, i))
+            bool isPalinDrome = IsPalinDrome(s, 0, i);
+            if (isPalinDrome)
             {
-                vector<vector<string>> newInput(input.size());
-                copy(input.begin(), input.end(), newInput.begin());
+                string token(s.begin(), s.begin() + i + 1);
+                string newString(s.begin() + i + 1, s.end());
+                auto childResult = partition_palindrome(newString);
 
-                for(auto j : newInput)
+                if (childResult.size() == 0) result.push_back(list<string> { token });
+                else
                 {
-                    j.push_back(string(s.begin(), s.begin() + i));
-
-                    auto childResult = partition_palindrome(newInput, string(s.begin() + i, s.end()));
-
-                    for (int k = 0; k < childResult.size(); k++)
+                    for (auto k : childResult)
                     {
-                        vector<string> partition;
-                        copy(j.begin(), j.end(), partition);
-                        copy(childResult[k].begin(), childResult[k].end(), partition.end());
+                        list<string> partition{ token };
+                        copy(k.begin(), k.end(), back_inserter(partition));
 
                         result.push_back(partition);
                     }
@@ -45,6 +52,7 @@ public:
             }
         }
 
+        return result;
     }
 
     bool IsPalinDrome(string& s, size_t begin, size_t last)
