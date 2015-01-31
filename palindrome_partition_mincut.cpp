@@ -4,6 +4,8 @@
 #include <string>
 #include <iterator>
 #include <list>
+#include <limits>
+#include <cassert>
 
 using namespace std;
 
@@ -15,58 +17,65 @@ public:
             return 0;
         }
 
-        auto allResults = partition(s);
-        auto minElement = min_element(
-            allResults.begin(),
-            allResults.end(),
-            [](list<string> p1, list<string> p2) {return p1.size() < p2.size(); });
+        int ** result = new int *[s.length()];
 
-        return (*minElement).size() - 1;
-    }
-
-    list<list<string>> partition(string s) {
-        if (s.size() == 0) return list<list<string>>();
-
-        return partition_palindrome(s);
-    }
-
-    list<list<string>> partition_palindrome(string &s)
-    {
-        list<list<string>> result;
-        if (s.size() == 0) return result;
-
-        for (int i = 0; i < s.size(); i++)
+        for (int i = 0; i < s.length(); i++)
         {
-            bool isPalinDrome = IsPalinDrome(s, 0, i);
-            if (isPalinDrome)
-            {
-                string token(s.begin(), s.begin() + i + 1);
-                string newString(s.begin() + i + 1, s.end());
-                auto childResult = partition_palindrome(newString);
+            result[i] = new int [s.length()];
 
-                if (childResult.size() == 0) result.push_back(list < string > { token });
+            for (int j = 0; j < s.length(); j++)
+            {
+                if (j == i)
+                {
+                    result[i][j] = 0;
+                }
                 else
                 {
-                    for (auto k : childResult)
-                    {
-                        list<string> partition{ token };
-                        copy(k.begin(), k.end(), back_inserter(partition));
-
-                        result.push_back(partition);
-                    }
+                    result[i][j] = -1;
                 }
             }
         }
 
-        return result;
+        for (int i = 0; i < s.length(); i++)
+        {
+            for (int j = i; j < s.length(); j++)
+            {
+                if (result[i+j][j] >= 0 ) continue;
+
+                Compute(s, i, j, result);
+            }
+        }
     }
 
-    bool IsPalinDrome(string& s, size_t begin, size_t last)
+    void Compute(const string &s, int i, int j, int **result)
     {
-        size_t length = last - begin + 1;
-        for (int i = 0; i < length / 2; i++)
+        if (IsPalindrom(s.substr(i, j - i + 1)))
         {
-            if (s[i] != s[length - i - 1]) return false;
+            result[i][j] = 0;
+            return;
+        }
+
+        int min = std::numeric_limits<int>::max();
+        for (int k = i; k < j - i; k++)
+        {
+            assert(result[i][k] > -1);
+            assert(result[k + 1][j] > -1);
+
+            int resultCutAtK = result[i][k] + result[k + 1][j];
+            if (resultCutAtK < min)
+            {
+                min = resultCutAtK;
+            }
+        }
+
+        result[i][j] = min;
+    }
+
+    bool IsPalindrom(const string &s)
+    {
+        for (int i = 0; i < (s.length() - 1) / 2; i++)
+        {
+            if (s[i] != s[s.length() - i]) return false;
         }
 
         return true;
