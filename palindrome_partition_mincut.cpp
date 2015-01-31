@@ -19,19 +19,19 @@ public:
 
         int ** result = new int *[s.length()];
 
-        for (int i = 0; i < s.length(); i++)
+        for (int m = 0; m < s.length(); m++)
         {
-            result[i] = new int [s.length()];
+            result[m] = new int [s.length()];
 
-            for (int j = 0; j < s.length(); j++)
+            for (int n = 0; n < s.length(); n++)
             {
-                if (j == i)
+                if (n == m)
                 {
-                    result[i][j] = 0; 
+                    result[m][n] = 0; 
                 }
                 else
                 {
-                    result[i][j] = -1;
+                    result[m][n] = -1;
                 }
             }
         }
@@ -39,9 +39,9 @@ public:
         int i = 0, j = 0, iteration = 0;
         while (iteration < s.length())
         {
-            if (result[j][j + i] < 0)
+            if (result[i][j] < 0)
             {
-                Compute(s, j, j + i, result);
+                Compute(s, i, j, result);
             }
 
             if (j < s.length() - 1)
@@ -70,7 +70,7 @@ public:
         }
 
         int min = std::numeric_limits<int>::max();
-        for (int k = i; k < j - i; k++)
+        for (int k = i; k < j; k++)
         {
             assert(result[i][k] > -1);
             assert(result[k + 1][j] > -1);
@@ -87,9 +87,9 @@ public:
 
     bool IsPalindrom(const string &s)
     {
-        for (int i = 0; i < (s.length() - 1) / 2; i++)
+        for (int i = 0; i <= (s.length() - 1) / 2; i++)
         {
-            if (s[i] != s[s.length() - i]) return false;
+            if (s[i] != s[s.length() - i - 1]) return false;
         }
 
         return true;
@@ -100,6 +100,9 @@ void main()
 {
     Solution solution;
 
-    cout << "result: " << solution.minCut("aab") << endl;
+    string input("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+
+    cout << "input: " << input << "; length: " << input.length () << endl;
+    cout << "result: " << solution.minCut(input) << endl;
     
 }
