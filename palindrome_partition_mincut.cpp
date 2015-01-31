@@ -27,7 +27,7 @@ public:
             {
                 if (j == i)
                 {
-                    result[i][j] = 0;
+                    result[i][j] = 0; 
                 }
                 else
                 {
@@ -36,20 +36,34 @@ public:
             }
         }
 
-        for (int i = 0; i < s.length(); i++)
+        int i = 0, j = 0, iteration = 0;
+        while (iteration < s.length())
         {
-            for (int j = i; j < s.length(); j++)
+            if (result[j][j + i] < 0)
             {
-                if (result[i+j][j] >= 0 ) continue;
+                Compute(s, j, j + i, result);
+            }
 
-                Compute(s, i, j, result);
+            if (j < s.length() - 1)
+            {
+                i++;
+                j++;
+            }
+            else
+            {
+                iteration++;
+                i = 0;
+                j = iteration;
             }
         }
+
+        return result[0][s.length() - 1];
     }
 
     void Compute(const string &s, int i, int j, int **result)
     {
-        if (IsPalindrom(s.substr(i, j - i + 1)))
+        string targetString = s.substr(i, j - i + 1);
+        if (IsPalindrom(targetString))
         {
             result[i][j] = 0;
             return;
@@ -61,7 +75,7 @@ public:
             assert(result[i][k] > -1);
             assert(result[k + 1][j] > -1);
 
-            int resultCutAtK = result[i][k] + result[k + 1][j];
+            int resultCutAtK = result[i][k] + result[k + 1][j] + 1; 
             if (resultCutAtK < min)
             {
                 min = resultCutAtK;
